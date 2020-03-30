@@ -87,8 +87,8 @@ function convertTableToJson($, $table) {
   return output
 }
 
-function magic(url, type = 'bugs') {
-  getRawData(url).then(text => {
+function magic(url, type = 'bug') {
+  return getRawData(url).then(text => {
     // console.log(text)
     const $ = cheerio.load(text)
     // const northern = $('.tabbertab[title="Northern Hemisphere"]')
@@ -101,28 +101,28 @@ function magic(url, type = 'bugs') {
     let output2 = convertTableToJson($, southern)
     return prepareDB().then(db => {
       let nPromise = new Promise((resolve, reject) => {
-        db.collections(`northern_${type}`).insertMany(
-          northern,
-          (err, result) => {
+        const col = db.collection(`northern_${type}`)
+        col.deleteMany({}, (e, r) => {
+          col.insertMany(output, (err, result) => {
             if (err) {
               reject(err)
             } else {
               resolve(result.result.n)
             }
-          }
-        )
+          })
+        })
       })
       let sPromise = new Promise((resolve, reject) => {
-        db.collections(`southern_${type}`).insertMany(
-          southern,
-          (err, result) => {
+        const col = db.collection(`southern_${type}`)
+        col.deleteMany({}, (e, r) => {
+          col.insertMany(output2, (err, result) => {
             if (err) {
               reject(err)
             } else {
               resolve(result.result.n)
             }
-          }
-        )
+          })
+        })
       })
       return Promise.all([nPromise, sPromise])
     })
@@ -146,10 +146,13 @@ const prepareDB = () => {
 }
 
 exports.default = {
-  update: () => {
-    URL_LIST.forEach(url => {
-      magic(url.url, url.type)
-    })
+  update: async () => {
+    let resultList = []
+    for (let i = 0; i < URL_LIST.length; i++) {
+      const re = await magic(URL_LIST[i].url, URL_LIST[i].type)
+      resultList.push(re)
+    }
+    return resultList
   },
   prepareDB
 }
