@@ -1,0 +1,19 @@
+{
+  "name": "openfaas-function",
+  "version": "1.0.0",
+  "description": "openfaas koa function",
+  "main": "middlewares.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "zerob13",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bson-ext": "^2.0.3",
+    "cheerio": "^1.0.0-rc.3",
+    "mongodb": "^3.5.5",
+    "@koa/router": "^8.0.8"
+  }
+}
