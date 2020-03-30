@@ -1,5 +1,7 @@
 const Router = require('@koa/router')
 const scraper = require('./scraper').default
+const cors = require('koa2-cors')
+
 const _ = new Router()
 _.post('/update', async (ctx, next) => {
   const token = ctx.request.header['x-zerob13-token']
@@ -39,4 +41,14 @@ _.get('/:hemisphere/:type', async (ctx, next) => {
   await next()
 })
 
-exports.default = [_.routes(), _.allowedMethods()]
+exports.default = [
+  cors({
+    origin: ctx => {
+      // console.log(JSON.stringify(ctx.header))
+      return ctx.header.origin
+    },
+    credentials: true
+  }),
+  _.routes(),
+  _.allowedMethods()
+]
